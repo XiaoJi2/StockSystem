@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% block title %}龙虎榜{% endblock %}
+{% block content %}
+    <div class="row wrapper border-bottom white-bg page-heading">
+        <div class="col-lg-8">
+            <h2>Foo表格</h2>
+            <ol class="breadcrumb">
+                <li>
+                    <a href="index.html">主页</a>
+                </li>
+                <li>
+                    <a>表格</a>
+                </li>
+                <li class="active">
+                    <strong>龙虎榜</strong>
+                </li>
+            </ol>
+        </div>
+        <div class="col-lg-2">
+
+        </div>
+    </div>
+
+    <div class="wrapper wrapper-content animated fadeInRight">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+
+                        <div class="ibox-tools">
+                            <a class="collapse-link">
+                                <i class="fa fa-chevron-up"></i>
+                            </a>
+                            <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                <i class="fa fa-wrench"></i>
+                            </a>
+                            <a class="close-link">
+                                <i class="fa fa-times"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="ibox-content">
+
+                        <table class="footable table table-stripped toggle-arrow-tiny">
+                            <thead>
+                            <tr>
+
+                                <th data-toggle="true">编号</th>
+                                <th >时间</th>
+                                <th>游资名称</th>
+                                <th data-hide="all">买</th>
+                                <th data-hide="all">卖</th>
+{#                                <th data-hide="all">卖</th>#}
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for info in infos.List %}
+                                <tr>
+                                    <td>{{ loop.index }}</td>
+                                    <td>{{ infos.Date }}</td>
+                                    <td>{{ info.BName }}</td>
+                                    <td color="red">
+                                        {% for item in info.Buy %}
+                                            {{ item.Sto }}:{{ item.StoN }}:{{ item.Money | money_result_format }} <br>
+                                        {% endfor %}
+                                    </td>
+                                    <td style="color: #4cae4c">
+                                        {% for item in info.Sell %}
+                                            {{ item.Sto }}:{{ item.StoN }}:{{ item.Money | money_result_format }} <br>
+                                        {% endfor %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                            <tfoot>
+                            <tr>
+                                <td colspan="5">
+                                    <ul class="pagination pull-right"></ul>
+                                </td>
+                            </tr>
+                            </tfoot>
+                        </table>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+{% endblock %}
+{% block scripts %}
+    {{ super() }}
+    <!-- FooTable -->
+    <script src="{{ static('js/plugins/footable/footable.all.min.js')}}"></script>
+    <script>
+        $(document).ready(function() {
+            $('.footable').footable();
+        });
+
+    </script>
+{% endblock scripts %}

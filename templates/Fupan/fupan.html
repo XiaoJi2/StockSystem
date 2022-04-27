@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+{% block title %}股票复盘{% endblock %}
+{% block styles %}
+    .font_large{
+        font-size:x-large;
+        background-color:skyblue;
+    }
+
+    .font_small{
+        font-size:small;
+        background-color:skyblue;
+    }
+
+    table {
+            /*设置相邻单元格的边框间的距离*/
+            border-spacing: 0;
+            /*表格设置合并边框模型*/
+            border-collapse: collapse;
+            text-align: center;
+            height: 100%;
+            display: block;
+            overflow-y: scroll;
+        }
+
+    .gdt {
+            display: block;
+            overflow-y: scroll;
+            height: 1000px;
+        }
+{% endblock %}
+{% block content %}
+    <div class="row wrapper border-bottom white-bg page-heading">
+        <div class="col-sm-4">
+            <h2>数据表格</h2>
+            <ol class="breadcrumb">
+                <li>
+                    <a href="index.html">主页</a>
+                </li>
+                <li class="active">
+                    <strong>数据表格</strong>
+                </li>
+            </ol>
+        </div>
+    </div>
+    <div class="wrapper wrapper-content animated fadeInRight">
+         <div class="col-lg-4" >
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>涨停原因</h5>
+                    <div class="ibox-tools">
+                        <a class="collapse-link">
+                            <i class="fa fa-chevron-up"></i>
+                        </a>
+                        <a class="close-link">
+                            <i class="fa fa-times"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="ibox-content" >
+                    <table class="table" style="height: 950px;">
+                        {% for info in reason.list %}
+
+                            <thead>
+                                <tr>
+                                    <td colspan="8" class="font_large">{{ info.ZSName }}{{ reason.date }}</td>
+                                </tr>
+                                <tr>
+                                    <td colspan="8" class="font_small">{{ info.TCExplain }}</td>
+                                </tr>
+                                <tr>
+                                    <td>编号</td> <td>股票名称</td> <td>涨停时间</td> <td>状态</td> <td>板块</td> <td>开板</td> <td>封单</td> <td>成交额</td>
+                                </tr>
+                            </thead>
+{#                            <tr>#}
+{#                                <p>{{ loop.index }}</p>#}
+{#                            </tr>#}
+                            <tbody>
+                                {% for data in info.StockList %}
+                                    <tr>
+                                        <td >{{ loop.index }}</td>
+                                        <td >{{ data[1] }}({{ data[0] }})</td>
+                                        <td >{{ data[6] | time_result_format }}</td>
+                                        <td >{{ data[9] }}</td>
+                                        <td >{{ data[11] }}</td>
+                                        {% if data[18] == 1%}
+                                            <td >是</td>
+                                        {% else %}
+                                            <td >否</td>
+                                        {% endif %}
+                                        <td >{{ data[8] | money_result_format }}</td>
+                                        <td >{{ data[13] | money_result_format }}</td>
+
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        {% endfor %}
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3">
+           <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>盘面关注</h5>
+                    <div class="ibox-tools">
+                        <a class="collapse-link">
+                            <i class="fa fa-chevron-up"></i>
+                        </a>
+                        <a class="close-link">
+                            <i class="fa fa-times"></i>
+                        </a>
+                    </div>
+                </div>
+
+               <div class="ibox-content inspinia-timeline gdt">
+                    {% for info in guanzhu.List %}
+                        <div class="timeline-item">
+                            <div class="row">
+                                <div class="col-xs-3 date">
+                                    <i class="fa fa-briefcase"></i>
+                                        {{ info.TimeMin | time_result_format }}
+                                    <br/>
+                                    <small class="text-navy">1小时前</small>
+                                </div>
+                                <div class="col-xs-7 content no-top-border">
+                                    <p class="m-b-xs"><strong>{{ info.Detail }}</strong></p>
+                                    <p>
+                                        {% for list in info.StockList %}
+                                            {{ list[1] }}&nbsp; &nbsp; &nbsp;
+                                        {% endfor %}
+                                    </p>
+                                    <p><span class="label label-warning">{{ info.TagName }}</span><span class="label label-info">{{ info.ZSName }}</span></p>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+               </div>
+           </div>
+        </div>
+    </div>
+{% endblock %}
+{% block scripts %}
+    {{ super() }}
+    <script>
+
+
+    </script>
+{% endblock scripts %}

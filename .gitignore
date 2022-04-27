@@ -1,0 +1,15 @@
+/.idea/
+/venv/
+test.py
+/App/__pycache__/
+/App/migrations/
+/cmdb/__pycache__/
+/cmdb/migrations/
+/Fupan/__pycache__/
+/Fupan/migrations/
+/Login/__pycache__/
+/Login/migrations/
+/Panzhong/__pycache__/
+/Panzhong/migrations/
+db.sqlite3
+/.git/

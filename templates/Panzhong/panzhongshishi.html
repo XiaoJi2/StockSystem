@@ -1,0 +1,370 @@
+{% extends "base.html" %}
+{% block title %}盘中实时{% endblock %}
+{% block styles %}
+<style>
+{#  table  #}
+         table {
+            /*设置相邻单元格的边框间的距离*/
+            border-spacing: 0;
+            /*表格设置合并边框模型*/
+            border-collapse: collapse;
+            text-align: center;
+            height: 100%;
+        }
+        /*关键设置 tbody出现滚动条*/
+        table tbody {
+            display: block;
+            overflow-y: scroll;
+            height: 100%;
+        }
+
+        table thead,
+        tbody tr {
+            display: table;
+            width: 100%;
+            table-layout: fixed;
+        }
+        /*关键设置：滚动条默认宽度是16px 将thead的宽度减16px*/
+        table thead {
+            width: calc( 100% - 1em)
+        }
+
+        table thead th {
+            background: #ccc;
+        }
+
+        .gdt {
+            display: block;
+            overflow-y: scroll;
+            height: 520px;
+        }
+
+        .font_red{
+            color: red;
+        }
+
+        .font_green{
+            color: green;
+        }
+</style>
+{% endblock %}
+{% block content %}
+    <div class="row wrapper border-bottom white-bg page-heading">
+        <div class="col-sm-4">
+            <h2>数据表格</h2>
+            <ol class="breadcrumb">
+                <li>
+                    <a href="index.html">主页</a>
+                </li>
+                <li class="active">
+                    <strong>数据表格</strong>
+                </li>
+            </ol>
+        </div>
+    </div>
+    <div class="wrapper wrapper-content animated fadeInRight">
+        <div class="row" >
+            <div class="col-lg-3" >
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <h5>个股人气排名</h5>
+                        <div class="ibox-tools">
+                            <a class="collapse-link">
+                                <i class="fa fa-chevron-up"></i>
+                            </a>
+                            <a class="close-link">
+                                <i class="fa fa-times"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="ibox-content" >
+                        <table class="table" style="height: 350px;">
+                            <thead>
+                            <tr>
+                                <td>编号</td> <td>股票名称</td> <td>变化</td> <td>涨幅</td>
+                            </tr>
+                            </thead>
+                            <tbody>
+                                {% for info in ggrq %}
+                                <tr>
+                                        <td >{{ loop.index }}</td>
+                                        <td >{{ info[0] }}</td>
+                                        {% if info[1] > 0 %}
+                                            <td class="font_red">{{ info[1] }}</td>
+                                        {% else %}
+                                            <td class="font_green">{{ info[1] }}</td>
+                                        {% endif %}
+                                        {% if info[2] > 0 %}
+                                            <td class="font_red">{{ info[2] }}</td>
+                                        {% else %}
+                                            <td class="font_green">{{ info[2] }}</td>
+                                        {% endif %}
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="col-lg-4">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <h5>板块人气排名</h5>
+                        <div class="ibox-tools">
+                            <a class="collapse-link">
+                                <i class="fa fa-chevron-up"></i>
+                            </a>
+                            <a class="close-link">
+                                <i class="fa fa-times"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="ibox-content">
+
+                        <table class="table" style="height: 350px;">
+                            <thead>
+                            <tr>
+                                <td>编号</td> <td>板块名称</td> <td>人气</td> <td>涨速</td> <td>主力净额</td> <td>个股</td>
+                            </tr>
+                            </thead>
+                            <tbody>
+                                {% for info in bbrq %}
+                                    <tr>
+                                            <td >{{ loop.index }}</td>
+                                            <td >{{ info[1] }}</td>
+                                            <td >{{ info[2] }}</td>
+                                            {% if info[3] > 0 %}
+                                                <td class="font_red">{{ info[3] }}</td>
+                                            {% else %}
+                                                <td class="font_green">{{ info[3] }}</td>
+                                            {% endif %}
+                                            {% if info[4] > 0 %}
+                                                <td class="font_red">{{ info[4] | money_result_format }}</td>
+                                            {% else %}
+                                                <td class="font_green">{{ info[4] | money_result_format }}</td>
+                                            {% endif %}
+                                            <td>
+                                                <button type="button" class="btn" value="{{ info[0] }}" onclick="GetGeGu(this)">查看</button>
+                                            </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+
+                    </div>
+                </div>
+            </div>
+             <div class="col-lg-5">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <h5>个股详情</h5>
+                        <div class="ibox-tools">
+                            <a class="collapse-link">
+                                <i class="fa fa-chevron-up"></i>
+                            </a>
+                            <a class="close-link">
+                                <i class="fa fa-times"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="ibox-content">
+                        <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+                        <table class="table" style="height: 350px;">
+                            <thead>
+                            <tr>
+                                 <td>编号</td> <td>股票代码</td> <td>股票名称</td> <td>涨幅</td> <td>总成交</td> <td>主力</td> <td>主力净额</td> <td>连板</td> <td>板块</td>
+                            </tr>
+                            </thead>
+                            <tbody id="tbody-content">
+
+                                {% for info in bankuaigegu.data %}
+                                    <tr>
+                                            <td >{{ loop.index }}</td>
+                                            <td >{{ info[0] }}</td>
+                                            <td >{{ info[1] }}</td>
+                                            <td >{{ info[2] }}</td>
+                                            <td >{{ info[3] }}</td>
+                                            <td >{{ info[4] }}</td>
+                                            <td >{{ info[5] }}</td>
+                                            <td >{{ info[6] }}</td>
+                                            <td >{{ info[7] }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+         <div class="row">
+                <div class="col-lg-4">
+                   <div class="ibox float-e-margins">
+                        <div class="ibox-title">
+                            <h5>新闻快讯</h5>
+                            <div class="ibox-tools">
+                                <a class="collapse-link">
+                                    <i class="fa fa-chevron-up"></i>
+                                </a>
+                                <a class="close-link">
+                                    <i class="fa fa-times"></i>
+                                </a>
+                            </div>
+                        </div>
+
+                       <div class="ibox-content inspinia-timeline gdt">
+                            {% for new in news %}
+                                <div class="timeline-item">
+                                    <div class="row">
+                                        <div class="col-xs-3 date">
+                                            <i class="fa fa-briefcase"></i>
+                                                {{ new.datatime }}
+                                            <br/>
+                                            <small class="text-navy">2小时前</small>
+                                        </div>
+                                        <div class="col-xs-7 content no-top-border">
+                                            <p class="m-b-xs"><strong>{{ new.title }}</strong></p>
+                                            {% if new.summary %}
+                                                <p>{{ new.summary }}</p>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                       </div>
+                   </div>
+                </div>
+
+                <div class="col-lg-4">
+                    <div class="ibox float-e-margins">
+                        <div class="ibox-title">
+                            <h5>短线精灵</h5>
+                            <div class="ibox-tools">
+                                <a class="collapse-link">
+                                    <i class="fa fa-chevron-up"></i>
+                                </a>
+                                <a class="close-link">
+                                    <i class="fa fa-times"></i>
+                                </a>
+                            </div>
+                        </div>
+
+                       <div class="ibox-content inspinia-timeline gdt">
+                            {% for data in duanxian %}
+                                <div class="timeline-item">
+                                    <div class="row">
+                                        <div class="col-xs-3 date">
+                                            <i class="fa fa-briefcase"></i>
+                                                {{ data.time }}
+                                            <br/>
+                                            <small class="text-navy">2小时前</small>
+                                        </div>
+                                        <div class="col-xs-7 content no-top-border">
+                                            <p class="m-b-xs">
+                                                {% if data.status_color == 1 %}
+                                                    <strong class="font_red">{{ data.stock}}&nbsp;&nbsp;{{ data.status }}</strong>
+                                                {% else %}
+                                                    <strong class="font_green">{{ data.stock}}&nbsp;&nbsp;{{ data.status }}</strong>
+                                                {% endif %}
+                                            </p>
+                                            {% if data.content %}
+                                                <p>{{ data.content }}</p>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                       </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4">
+                    <div class="ibox float-e-margins">
+                        <div class="ibox-title">
+                            <h5>大盘直播</h5>
+                            <div class="ibox-tools">
+                                <a class="collapse-link">
+                                    <i class="fa fa-chevron-up"></i>
+                                </a>
+                                <a class="close-link">
+                                    <i class="fa fa-times"></i>
+                                </a>
+                            </div>
+                        </div>
+
+                       <div class="ibox-content inspinia-timeline gdt">
+                            {% for data in dapanzhibo %}
+                                <div class="timeline-item">
+                                    <div class="row">
+                                        <div class="col-xs-3 date">
+                                            <i class="fa fa-briefcase"></i>
+                                                {{ data.time }}
+                                            <br/>
+                                            <small class="text-navy">2小时前</small>
+                                        </div>
+                                        <div class="col-xs-7 content no-top-border">
+                                            <p class="m-b-xs">
+                                                {% if data.type == '1' %}
+                                                    <strong class="font_red">{{ data.comment }}</strong>
+                                                {% else %}
+                                                    <strong>{{ data.comment }}</strong>
+                                                {% endif %}
+
+                                            </p>
+                                                <p>{% for stock in data.stock %}
+                                                    {% if stock[1] > 0 %}
+                                                        <p class="font_red">{{ stock[0] }} {{ stock[1] }}</p>
+                                                    {% else %}
+                                                        <p class="font_green">{{ stock[0] }} {{ stock[1] }}</p>
+                                                    {% endif %}
+                                                    {% endfor %}
+                                                </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                       </div>
+                    </div>
+                </div>
+        </div>
+    </div>
+{% endblock %}
+{% block scripts %}
+    {{ super() }}
+    <!-- jqGrid -->
+{#    <script src="/static/js/plugins/jqGrid/i18n/grid.locale-en.js"></script>#}
+{#    <script src="/static/js/plugins/jqGrid/jquery.jqGrid.min.js"></script>#}
+    <script>
+        function GetGeGu(a){
+            var id= a.value;
+            var html = ""
+            csrf = $("[type=hidden]").val();
+            console.log(csrf)
+            $.ajax({
+                url:"{{ url('Panzhong:bankuaigegu') }}",
+                type: 'POST',
+                data:{id:id, csrfmiddlewaretoken:csrf},
+                success:function(result){
+                    var resultlen = result.data.length
+                    for(var i = 0; i < resultlen; i++){
+						html += "<tr>";
+						html += "<td >"+(i+1)+"</td>";
+						var s = result.data[i];
+                       for(var j = 0; j < s.length; j++){
+                           html += "<td >"+s[j]+"</td>";
+                           {#console.log(s[j])#}
+                       }
+                       html += "</tr>";
+					}
+                    console.log(html)
+                    document.getElementById("tbody-content").innerHTML = html;
+                    {#console.log(tr.next('td'))#}
+                }})
+        }
+
+        setTimeout(function(){location.reload()},60000);
+    </script>
+{% endblock scripts %}
