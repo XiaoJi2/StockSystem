@@ -17,27 +17,26 @@ def update(request):
     if request.GET:
         datetime = request.GET.get('time')
         now = get_today_time("%Y-%m-%d")
-        if now[:10] == datetime.rjust(10,'0'):
-            qingxutable = QingXuBiao()
-            result = qingxutable.checkdata(datetime)
-            if result:
-                is_ok = qingxutable.update()
-                if is_ok :
-                    print('更新成功')
-                    infos = qingxutable.getinfo()
-                    return render(request, "Fupan/qingxu.html", context=locals())
-                else:
-                    print('更新失败')
-                    return HttpResponse("更新错误")
+        # if now[:10] == datetime.rjust(10,'0'):
+        qingxutable = QingXuBiao()
+        result = qingxutable.checkdata(str(datetime))
+        if result:
+            is_ok = qingxutable.update(datetime)
+            if is_ok :
+                print('更新成功')
+                infos = qingxutable.getinfo()
+                return render(request, "Fupan/qingxu.html", context=locals())
             else:
+                print('更新失败')
                 return HttpResponse("更新错误")
         else:
-            return HttpResponse("目前不允许更新之前的内容")
+            return HttpResponse("更新错误")
+        # else:
+        #     return HttpResponse("目前不允许更新之前的内容")
 
 @login_required(login_url='Login:login')
 def longhubang(request):
     longhutable = LongHuBang()
-    # infos = dict({'Date': '2021-12-07', 'Time': 1638886487, 'List': [{'BName': '机构', 'BID': 0, 'Buy': [{'Sto': '002733', 'StoN': '雄韬股份', 'Money': 20996555, 'Three': 0}, {'Sto': '002565', 'StoN': '顺灏股份', 'Money': 14837019, 'Three': 1}, {'Sto': '300479', 'StoN': '神思电子', 'Money': 4190369, 'Three': 0}, {'Sto': '002805', 'StoN': '丰元股份', 'Money': 22172967, 'Three': 0}, {'Sto': '605286', 'StoN': '同力日升', 'Money': 1054831, 'Three': 0}, {'Sto': '002232', 'StoN': '启明信息', 'Money': 33124482, 'Three': 0}, {'Sto': '001205', 'StoN': '盛航股份', 'Money': 4347685, 'Three': 0}, {'Sto': '002965', 'StoN': '祥鑫科技', 'Money': 4419205, 'Three': 0}, {'Sto': '605369', 'StoN': '拱东医疗', 'Money': 233487429.64, 'Three': 1}, {'Sto': '603978', 'StoN': '深圳新星', 'Money': 29480671.09, 'Three': 0}, {'Sto': '001213', 'StoN': '中铁特货', 'Money': 657550, 'Three': 0}, {'Sto': '601689', 'StoN': '拓普集团', 'Money': 162025280.02, 'Three': 1}, {'Sto': '600021', 'StoN': '上海电力', 'Money': 116005163.95, 'Three': 0}, {'Sto': '301128', 'StoN': '强瑞技术', 'Money': 747975, 'Three': 0}, {'Sto': '002584', 'StoN': '西陇科学', 'Money': 49124272, 'Three': 1}, {'Sto': '002508', 'StoN': '老板电器', 'Money': 50253959, 'Three': 0}, {'Sto': '600027', 'StoN': '华电国际', 'Money': 120206232.07, 'Three': 1}, {'Sto': '301133', 'StoN': '金钟股份', 'Money': 4252767, 'Three': 0}, {'Sto': '301039', 'StoN': '中集车辆', 'Money': 22689069, 'Three': 0}], 'Sell': [{'Sto': '300291', 'StoN': '华录百纳', 'Money': -13350400, 'Three': 0}, {'Sto': '605399', 'StoN': '晨光新材', 'Money': -36317533, 'Three': 0}, {'Sto': '605005', 'StoN': '合兴股份', 'Money': -17693048.64, 'Three': 0}, {'Sto': '002058', 'StoN': '*ST威尔', 'Money': -4869022, 'Three': 1}, {'Sto': '601689', 'StoN': '拓普集团', 'Money': -637024342.74, 'Three': 1}, {'Sto': '000503', 'StoN': '国新健康', 'Money': -11714139, 'Three': 0}, {'Sto': '600021', 'StoN': '上海电力', 'Money': -74620318.83, 'Three': 0}, {'Sto': '301128', 'StoN': '强瑞技术', 'Money': -14022532, 'Three': 0}, {'Sto': '002584', 'StoN': '西陇科学', 'Money': -32204283, 'Three': 1}, {'Sto': '603335', 'StoN': '迪生力', 'Money': -6478904, 'Three': 1}, {'Sto': '600027', 'StoN': '华电国际', 'Money': -135111685.57, 'Three': 1}, {'Sto': '301133', 'StoN': '金钟股份', 'Money': -19288194, 'Three': 0}, {'Sto': '301039', 'StoN': '中集车辆', 'Money': -17275624, 'Three': 0}, {'Sto': '002725', 'StoN': '跃岭股份', 'Money': -4136839, 'Three': 1}, {'Sto': '002565', 'StoN': '顺灏股份', 'Money': -28536884, 'Three': 1}, {'Sto': '600698', 'StoN': '湖南天雁', 'Money': -1339866, 'Three': 0}, {'Sto': '301199', 'StoN': 'N迈赫', 'Money': -6501908, 'Three': 0}, {'Sto': '301126', 'StoN': 'N达嘉', 'Money': -6390627, 'Three': 0}, {'Sto': '300479', 'StoN': '神思电子', 'Money': -5834267, 'Three': 0}, {'Sto': '002805', 'StoN': '丰元股份', 'Money': -6010166, 'Three': 0}, {'Sto': '002572', 'StoN': '索菲亚', 'Money': -34152350, 'Three': 0}, {'Sto': '605111', 'StoN': '新洁能', 'Money': -213158679.09, 'Three': 0}, {'Sto': '002232', 'StoN': '启明信息', 'Money': -11320521, 'Three': 0}, {'Sto': '001205', 'StoN': '盛航股份', 'Money': -1475665, 'Three': 0}, {'Sto': '300807', 'StoN': '天迈科技', 'Money': -7853271, 'Three': 0}, {'Sto': '002965', 'StoN': '祥鑫科技', 'Money': -1139200, 'Three': 0}, {'Sto': '605369', 'StoN': '拱东医疗', 'Money': -302976848.8, 'Three': 1}, {'Sto': '603876', 'StoN': '鼎胜新材', 'Money': -34191712.26, 'Three': 0}, {'Sto': '001213', 'StoN': '中铁特货', 'Money': -9119252, 'Three': 0}]}, {'BName': '章盟主', 'BID': 41, 'Buy': [{'Sto': '002265', 'StoN': '西仪股份', 'Money': 3112949, 'Three': 1}], 'Sell': [{'Sto': '002232', 'StoN': '启明信息', 'Money': -24130366, 'Three': 0}]}, {'BName': '炒股养家', 'BID': 20, 'Buy': [{'Sto': '603701', 'StoN': '德宏股份', 'Money': 33406898.82, 'Three': 1}], 'Sell': []}, {'BName': '宁波桑田路', 'BID': 22, 'Buy': [{'Sto': '002374', 'StoN': '中锐股份', 'Money': 53599763, 'Three': 0}, {'Sto': '002584', 'StoN': '西陇科学', 'Money': 32432833, 'Three': 1}, {'Sto': '603178', 'StoN': '圣龙股份', 'Money': 19577097, 'Three': 0}], 'Sell': [{'Sto': '002374', 'StoN': '中锐股份', 'Money': -818558, 'Three': 0}, {'Sto': '002584', 'StoN': '西陇科学', 'Money': -107850406, 'Three': 1}]}, {'BName': '作手新一', 'BID': 35, 'Buy': [{'Sto': '000812', 'StoN': '陕西金叶', 'Money': 675496, 'Three': 0}], 'Sell': [{'Sto': '000812', 'StoN':'陕西金叶', 'Money': -32344742, 'Three': 0}, {'Sto': '600860', 'StoN': '京城股份', 'Money': -27652137, 'Three': 1}]}, {'BName': '上海溧阳路', 'BID': 8, 'Buy': [{'Sto': '001317', 'StoN': '三羊马', 'Money': 14171651, 'Three': 0}], 'Sell': []}, {'BName': '成都系', 'BID': 7, 'Buy': [{'Sto': '300675', 'StoN': '建科院', 'Money': 9663299, 'Three': 0}, {'Sto': '000736', 'StoN': '中交地产', 'Money': 14009462, 'Three': 1}, {'Sto': '600698', 'StoN': '湖南天雁', 'Money': 3668620, 'Three': 1}], 'Sell': []}, {'BName': '飞云江路', 'BID': 46, 'Buy': [{'Sto': '300675', 'StoN': '建科院', 'Money': 3447140, 'Three': 0}], 'Sell': [{'Sto': '300675', 'StoN': '建科院', 'Money': -17753318, 'Three': 0}]}], 'ttag': 0.001707, 'errcode': '0'})#
     infos = longhutable.get_info()
     if infos:
         return render(request, "Fupan/longhubang.html", context=locals())
@@ -91,4 +90,6 @@ def auto_update(datetime):
 #     print(e)
 #     # 报错则调度器停止执行
 #     scheduler.shutdown()
-
+@login_required(login_url='Login:login')
+def qiangchou(request):
+    return None

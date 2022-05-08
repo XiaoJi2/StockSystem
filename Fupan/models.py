@@ -45,9 +45,12 @@ class QingXuMode(models.Model):
     Total = models.IntegerField()
     # 更新时间
     updatetime = models.DateTimeField(auto_now=True)
-    zhangdie = models.CharField(max_length=16)
+    zhangdie = models.CharField(max_length=4)
     #最大连板数
     lianbanmax = models.IntegerField()
+    lowtohigh = models.IntegerField()
+    hightohigh = models.IntegerField()
+    intensity = models.CharField(max_length=4)
 
     class Meta:
         db_table = 'qingxu'
@@ -71,7 +74,7 @@ class QingXuMode(models.Model):
 class QingXuBiao(object):
     def __init__(self):
         pass
-    def update(self):
+    def update(self,uptime = ''):
         moodtable = QingXuMode()
         zhangtingmood = ''
         limitupcount = 0
@@ -85,31 +88,30 @@ class QingXuBiao(object):
         threeupcount = 0
         threestockname = ''
         threeupstockname = ''
-        # table = MoodTable.query.filter(MoodTable.rdatatime == datatime).first()
-        # if( table ):
-        #     return False
-        now = get_today_time("%Y%m%d")
-        tsmodule = TuShareModule()
-        if tsmodule.trade_calendar(now) == False:
-            # moodtable.hongpan = 0
-            # moodtable.rdatatime = str(datetime.date.today())
-            # moodtable.lvpan = 0
-            # moodtable.realzhangting = 0
-            # moodtable.dieting = 0
-            # moodtable.zhaban = 0
-            # moodtable.lianban = 0
-            # moodtable.lianban2 = 0
-            # moodtable.liangban3 = 0
-            # moodtable.liangban3gegu = ''
-            # moodtable.liangban3up = 0
-            # moodtable.liangban3upgegu = ''
-            # moodtable.Total = 0
-            # moodtable.zhangdie = '休'
-            # moodtable.save()
-            return True
+
+        # now = get_today_time("%Y%m%d")
+        # tsmodule = TuShareModule()
+        # if tsmodule.trade_calendar(now) == False:
+        #     # moodtable.hongpan = 0
+        #     # moodtable.rdatatime = str(datetime.date.today())
+        #     # moodtable.lvpan = 0
+        #     # moodtable.realzhangting = 0
+        #     # moodtable.dieting = 0
+        #     # moodtable.zhaban = 0
+        #     # moodtable.lianban = 0
+        #     # moodtable.lianban2 = 0
+        #     # moodtable.liangban3 = 0
+        #     # moodtable.liangban3gegu = ''
+        #     # moodtable.liangban3up = 0
+        #     # moodtable.liangban3upgegu = ''
+        #     # moodtable.Total = 0
+        #     # moodtable.zhangdie = '休'
+        #     # moodtable.save()
+        #     return True
 
         # 大盘指数
-        myspider = Spider("https://api-ddc-wscn.xuangubao.cn/market/trend?fields=tick_at,close_px&prod_code=000001.SS")
+        url = "https://api-ddc-wscn.xuangubao.cn/market/trend?fields=tick_at,close_px&prod_code=000001.SS&date=" + uptime
+        myspider = Spider(url)
         htmljson = myspider.getJson()
         dictDate = htmljson['message']
         if dictDate == 'OK':
@@ -125,7 +127,8 @@ class QingXuBiao(object):
                 zhangtingmood = '平'
 
         # 涨跌停数量
-        myspider.setUrl("https://flash-api.xuangubao.cn/api/market_indicator/line?fields=limit_up_count,limit_down_count")
+        url = "https://flash-api.xuangubao.cn/api/market_indicator/line?fields=limit_up_count,limit_down_count&date=" + uptime
+        myspider.setUrl(url)
         htmljson = myspider.getJson()
         dictDate = htmljson['message']
         if dictDate == 'OK':
@@ -133,7 +136,8 @@ class QingXuBiao(object):
             limitdowncount = htmljson['data'][-1]["limit_down_count"]
 
         # 涨跌数量
-        myspider.setUrl("https://flash-api.xuangubao.cn/api/market_indicator/line?fields=rise_count,fall_count")
+        url = "https://flash-api.xuangubao.cn/api/market_indicator/line?fields=rise_count,fall_count&date=" + uptime
+        myspider.setUrl(url)
         htmljson = myspider.getJson()
         dictDate = htmljson['message']
         if dictDate == 'OK':
@@ -141,14 +145,16 @@ class QingXuBiao(object):
             fallcount = htmljson['data'][-1]["fall_count"]
 
         # 炸板数量
-        myspider.setUrl("https://flash-api.xuangubao.cn/api/market_indicator/line?fields=limit_up_broken_count,limit_up_broken_ratio")
+        url = "https://flash-api.xuangubao.cn/api/market_indicator/line?fields=limit_up_broken_count,limit_up_broken_ratio&date=" + uptime
+        myspider.setUrl(url)
         htmljson = myspider.getJson()
         dictDate = htmljson['message']
         if dictDate == 'OK':
             brokencount = htmljson['data'][-1]["limit_up_broken_count"]
 
         # 涨停
-        myspider.setUrl("https://flash-api.xuangubao.cn/api/pool/detail?pool_name=limit_up")
+        url = "https://flash-api.xuangubao.cn/api/pool/detail?pool_name=limit_up&date=" + uptime
+        myspider.setUrl(url)
         htmljson = myspider.getJson()
         dictDate = htmljson['message']
         max_num = 0
@@ -172,7 +178,7 @@ class QingXuBiao(object):
                     max_num = tmp_num
 
         moodtable.hongpan = risecount
-        moodtable.rdatatime = str(datetime.date.today())
+        moodtable.rdatatime = uptime#str(datetime.date.today())
         moodtable.lvpan = fallcount
         moodtable.realzhangting = limitupcount
         moodtable.dieting = limitdowncount
@@ -186,11 +192,34 @@ class QingXuBiao(object):
         moodtable.Total = 0
         moodtable.zhangdie = zhangtingmood
         moodtable.lianbanmax = max_num
+        moodinfo = QingXuMode.objects.all().order_by('rdatatime').last()
+        print("------")
+        print(type(moodinfo))
+        print(moodinfo.lianban2)
+        if (moodinfo.lianban2 != 0):
+            print()
+            moodtable.lowtohigh = int(round((threecount/moodinfo.lianban2)*100, 0))
+        else:
+            moodtable.lowtohigh = 0
+        if ((moodinfo.liangban3 + moodinfo.liangban3up) != 0):
+            moodtable.hightohigh = int(round((threeupcount/(moodinfo.liangban3 + moodinfo.liangban3up))*100, 0))
+        else:
+            moodtable.hightohigh = 0
+
+        if(moodinfo.hightohigh != None):
+            if( moodtable.hightohigh > int(moodinfo.hightohigh)  ):
+                moodtable.intensity = '强'
+            elif (moodtable.hightohigh == int(moodinfo.hightohigh) and moodtable.lowtohigh > int(moodinfo.lowtohigh)):
+                moodtable.intensity = '强'
+            else:
+                moodtable.intensity = '弱'
+        else:
+            moodtable.intensity = '强'
         moodtable.save()
         return True
 
     def getinfo(self):
-        moodinfo = QingXuMode.objects.all().order_by('-rdatatime')
+        moodinfo = QingXuMode.objects.all().order_by('rdatatime')#('-rdatatime')
         return moodinfo
 
     def checkdata(self, datetime):

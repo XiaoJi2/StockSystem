@@ -23,5 +23,6 @@ urlpatterns = [
     path('qingxu/', views.qingxu, name='qingxu'),
     path('update/', views.update, name='update'),
     path('longhubang/', views.longhubang, name='longhubang'),
-    path('gupiaofupan/', views.gupiaofupan, name='gupiaofupan')
+    path('gupiaofupan/', views.gupiaofupan, name='gupiaofupan'),
+    path('qiangchou/', views.qiangchou, name='qiangchou'),
 ]

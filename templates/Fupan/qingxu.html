@@ -50,11 +50,12 @@
                     <table class="table table-striped table-bordered table-hover dataTables-example" >
                     <thead>
                     <tr>
-                        <td>编号</td> <td>日期</td> <td>红盘</td> <td>绿盘</td> <td>红盘百分比</td> <td>实际涨停</td> <td>跌停</td> <td>炸板</td> <td>连板</td> <td>2连板</td> <td>3连板</td> <td>3连板个股</td> <td>3连板以上</td> <td>3连板以上个股</td> <td>总金额</td>
+                        <td>编号</td> <td>日期</td> <td>红盘</td> <td>绿盘</td> <td>红盘百分比</td> <td>实际涨停</td> <td>跌停</td> <td>炸板</td> <td>连板</td> <td>2连板</td> <td>3连板</td> <td>3连板个股</td> <td>3连板以上</td> <td>3连板以上个股</td> <td>低进高</td><td>高进高</td><td>强弱</td><td>总金额</td>
                     </tr>
                     </thead>
                     <tbody>
                         {% for info in infos %}
+
                         <tr class="gradeA">
                             <td>{{ loop.index }}</td>
                             <td  style="white-space:nowrap;">{{ info.rdatatime }}</td>
@@ -102,13 +103,20 @@
                             <td>{{ info.liangban3gegu }}</td>
                             <td>{{ info.liangban3up }}</td>
                             <td>{{ info.liangban3upgegu }}</td>
+                            <td>{{ info.lowtohigh }}%</td>
+                            <td>{{ info.hightohigh }}%</td>
+                            {% if info.intensity == '弱' %}
+                                <td style="background-color:#00FF00">{{ info.intensity }}</td>
+                            {% else %}
+                                <td style="background-color:#FF0000">{{ info.intensity }}</td>
+                            {% endif %}
                             <td>{{ info.Total }}</td>
                         </tr>
                     {% endfor %}
                     </tbody>
                     <tfoot>
                     <tr>
-                        <td>编号</td> <td>日期</td> <td>红盘</td> <td>绿盘</td> <td>红盘百分比</td> <td>实际涨停</td> <td>跌停</td> <td>炸板</td> <td>连板</td> <td>2连板</td> <td>3连板</td> <td>3连板个股</td> <td>3连板以上</td> <td>3连板以上个股</td> <td>总金额</td>
+                        <td>编号</td> <td>日期</td> <td>红盘</td> <td>绿盘</td> <td>红盘百分比</td> <td>实际涨停</td> <td>跌停</td> <td>炸板</td> <td>连板</td> <td>2连板</td> <td>3连板</td> <td>3连板个股</td> <td>3连板以上</td> <td>3连板以上个股</td> <td>低进高</td><td>高进高</td><td>强弱</td><td>总金额</td>
                     </tr>
                     </tfoot>
                     </table>
